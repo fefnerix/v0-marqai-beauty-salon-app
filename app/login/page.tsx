@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const supabase = createBrowserClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,6 +24,7 @@ export default function LoginPage() {
     setError("")
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -44,18 +44,24 @@ export default function LoginPage() {
 
   const handleTempAdminAccess = async () => {
     setLoading(true)
+    setError("")
+
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email: "admin@marqai.com",
         password: "admin123",
       })
 
       if (error) {
-        setError("Acesso temporário não disponível")
+        console.log("[v0] Admin login error:", error.message)
+        setError("Acesso temporário não disponível. Verifique se o usuário admin foi criado.")
       } else {
+        console.log("[v0] Admin login successful")
         router.replace("/dashboard")
       }
     } catch (err) {
+      console.log("[v0] Admin login exception:", err)
       setError("Erro no acesso temporário")
     } finally {
       setLoading(false)
