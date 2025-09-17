@@ -1,15 +1,17 @@
 import type React from "react"
 import { redirect } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
+
+export const dynamic = "force-dynamic"
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createServerClient()
+  const supabase = await createClient()
 
   const {
     data: { session },
