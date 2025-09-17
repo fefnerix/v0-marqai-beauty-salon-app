@@ -5,6 +5,12 @@ import { updateSession } from "@/lib/supabase/middleware"
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  const isPublic = pathname === "/login" || pathname.startsWith("/api/dev-login") || pathname.startsWith("/api/health")
+
+  if (isPublic) {
+    return NextResponse.next()
+  }
+
   const response = await updateSession(request)
 
   // Get session from the response

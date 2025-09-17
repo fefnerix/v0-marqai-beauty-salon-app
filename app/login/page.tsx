@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+
+  const devEnabled = useMemo(
+    () => process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "1",
+    [],
+  )
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,6 +45,11 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function onDevLogin() {
+    // use GET para permitir redirect do servidor com cookies de sessão
+    window.location.assign("/api/dev-login")
   }
 
   const handleTempAdminAccess = async () => {
@@ -114,6 +124,18 @@ export default function LoginPage() {
               <span className="bg-background px-2 text-muted-foreground">Desenvolvimento</span>
             </div>
           </div>
+
+          {devEnabled && (
+            <Button
+              type="button"
+              onClick={onDevLogin}
+              variant="outline"
+              className="w-full border-2 border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-800"
+              title="Somente em ambiente de desenvolvimento"
+            >
+              🚧 Entrar como Dev (admin)
+            </Button>
+          )}
 
           <Button
             variant="outline"
